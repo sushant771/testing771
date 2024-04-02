@@ -1,0 +1,525 @@
+<mvc:View controllerName="com.rizing.lcp.productworkbench2.controller.Worklist" xmlns="sap.m" xmlns:table="sap.ui.table"
+	xmlns:mvc="sap.ui.core.mvc" xmlns:f="sap.f" xmlns:fb="sap.ui.comp.filterbar" xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+	xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" xmlns:smartTable="sap.ui.comp.smarttable"
+	xmlns:l="sap.ui.layout" xmlns:form="sap.ui.layout.form" xmlns:sv="sap.ui.comp.smartvariants" xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+	<IconTabBar id="idIconTabBar" class="sapUiResponsiveContentPadding" expandable="true" applyContentPadding="false" headerMode="Inline">
+	<items>
+	<IconTabFilter icon="sap-icon://product" text="{i18n>productWorkbench}">
+	<f:DynamicPage fitContent="true">
+		<f:title >
+		<!-- visible="{worklistView>/setVisibleAsLocation}"   rajithaw-->
+			<f:DynamicPageTitle >   
+				<f:heading>
+					<sv:SmartVariantManagement  id="idSmartVariantManagement" persistencyKey="SmartVariantManagementProductWorkbench" showShare="true"
+						showExecuteOnSelection="true" entitySet="ProductWorkbenchKPISet"/>
+				</f:heading>
+				<f:snappedContent>
+					<Text text="{worklistView>/filterInfoText}"/>
+				</f:snappedContent>
+			</f:DynamicPageTitle>
+		</f:title>
+
+		<f:header>
+			<f:DynamicPageHeader pinnable="true">
+				<f:content>
+
+					<!-- rajithaw -->
+	            	<VBox class="sapUiSmallMargin" visible="{worklistView>/setVisibleRadioButtonGroup}">
+		     			<Label text="Select Location/Zone" labelFor="GroupA" visible="{worklistView>/setVisibleRadioButtonGroup}" />
+		     			<RadioButtonGroup id="GroupA" columns="3" select="onSelect_Radiobutton" visible="{worklistView>/setVisibleRadioButtonGroup}">
+			   				<RadioButton id="location" text="By Location"  selected="true"  />
+			   				<RadioButton id="zone" text="By Zone"  />
+		     			</RadioButtonGroup>
+	      			</VBox>
+					<!-- rajend -->
+
+					<smartFilterBar:SmartFilterBar  visible="{worklistView>/setVisibleAsLocation}" id="idSmartFilterBar" entitySet="ProductWorkbenchKPISet" useToolbar="false"
+						assignedFiltersChanged=".onAssignedFiltersChanged" beforeVariantFetch="onBeforeVariantFetch" afterVariantLoad="onAfterVariantLoad"
+						smartVariant="idSmartVariantManagement" persistencyKey="SmartFilterBarProductWorkbench">
+						<smartFilterBar:controlConfiguration>
+							<smartFilterBar:ControlConfiguration index="0" visibleInAdvancedArea="true" key="SALESORGANIZATIONID" label="{i18n>salesOrganizationLabel}"
+								mandatory="mandatory"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="1" visibleInAdvancedArea="true" key="DISTRIBUTIONCHANNELID" mandatory="mandatory"
+								label="{i18n>DistributionChannelsLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="2" visibleInAdvancedArea="true" key="REGION" label="{i18n>RegionsLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="3" key="LOCATIONID" label="{i18n>StoreLabel}" visibleInAdvancedArea="true">
+								<smartFilterBar:customControl>
+									<MultiInput id="idMultiInputLocations" showSuggestion="true" maxSuggestionWidth="20em" showValueHelp="true"
+										valueHelpRequest="onValueHelpRequestLocations" suggest="onSuggestFilterLocation" customData:hasValue="false" tokenUpdate="onTokenUpdate"
+										suggestionItemSelected="onSuggestionItemSelectedFilterLocation">
+										<suggestionColumns>
+											<Column>
+												<Label text="{i18n>storeLocationIdLabel}"/>
+											</Column>
+											<Column>
+												<Label text="{i18n>storeLocationLabel}"/>
+											</Column>
+										</suggestionColumns>
+										<suggestionRows>
+											<ColumnListItem id="idColumnListItemFilterLocation">
+												<cells>
+													<Label text="{Code}"/>
+													<Label text="{Text}"/>
+												</cells>
+											</ColumnListItem>
+										</suggestionRows>
+									</MultiInput>
+								</smartFilterBar:customControl>
+							</smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="4" visibleInAdvancedArea="true" key="CATEGORY" label="{i18n>CategoriesLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="5" visibleInAdvancedArea="true" key="SUBCATEGORY" label="{i18n>subCategoryLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="6" key="PRODUCTID" label="{i18n>ProductLabel}" visibleInAdvancedArea="true" groupId="_BASIC"
+								mandatory="mandatory">
+								<smartFilterBar:customControl>
+									<MultiInput id="idMultiInputProducts" showSuggestion="true" maxSuggestionWidth="38em" showValueHelp="true" tokenUpdate="onTokenUpdate"
+										valueHelpRequest="onValueHelpRequestProducts" suggest="onSuggestFilterProduct" customData:hasValue="false"
+										suggestionItemSelected="onSuggestionItemSelectedFilterProduct">
+										<suggestionColumns>
+											<Column>
+												<Label text="{i18n>productIdLabel}"/>
+											</Column>
+											<Column>
+												<Label text="{i18n>productLabel}"/>
+											</Column>
+										</suggestionColumns>
+										<suggestionRows>
+											<ColumnListItem id="idColumnListItemFilterProduct">
+												<cells>
+													<Label text="{ path: 'Code', formatter: '.formatter.formatProductId' }"/>
+													<Label text="{Text}"/>
+												</cells>
+											</ColumnListItem>
+										</suggestionRows>
+									</MultiInput>
+								</smartFilterBar:customControl>
+							</smartFilterBar:ControlConfiguration>
+
+							
+							<!-- <smartFilterBar:ControlConfiguration index="9" visibleInAdvancedArea="true" key="ZONE" label="{i18n>ZoneLabel}"></smartFilterBar:ControlConfiguration>   -->
+							
+							
+						</smartFilterBar:controlConfiguration>
+					</smartFilterBar:SmartFilterBar>
+
+                    <!-- rajithaw for Tree Table by Zone-->
+                    <smartFilterBar:SmartFilterBar visible="{worklistView>/setVisibleAsZone}" id="idSmartFilterBar2" entitySet="ProductWorkbenchKPISet2" useToolbar="false"
+						assignedFiltersChanged=".onAssignedFiltersChanged" beforeVariantFetch="onBeforeVariantFetch" afterVariantLoad="onAfterVariantLoad"
+						smartVariant="idSmartVariantManagement" persistencyKey="SmartFilterBarProductWorkbench2">
+						<smartFilterBar:controlConfiguration>
+							<smartFilterBar:ControlConfiguration index="0" visibleInAdvancedArea="true" key="SALESORGANIZATIONID" label="{i18n>salesOrganizationLabel}"
+								mandatory="mandatory"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="1" visibleInAdvancedArea="true" key="DISTRIBUTIONCHANNELID" mandatory="mandatory"
+								label="{i18n>DistributionChannelsLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="2" visibleInAdvancedArea="true" key="REGION" label="{i18n>RegionsLabel}"></smartFilterBar:ControlConfiguration>
+							<!-- <smartFilterBar:ControlConfiguration index="3" key="LOCATIONID" label="{i18n>StoreLabel}" visibleInAdvancedArea="true">
+								<smartFilterBar:customControl>
+									<MultiInput id="idMultiInputLocations2" showSuggestion="true" maxSuggestionWidth="20em" showValueHelp="true"
+										valueHelpRequest="onValueHelpRequestLocations" suggest="onSuggestFilterLocation" customData:hasValue="false" tokenUpdate="onTokenUpdate"
+										suggestionItemSelected="onSuggestionItemSelectedFilterLocation">
+										<suggestionColumns>
+											<Column>
+												<Label text="{i18n>storeLocationIdLabel}"/>
+											</Column>
+											<Column>
+												<Label text="{i18n>storeLocationLabel}"/>
+											</Column>
+										</suggestionColumns>
+										<suggestionRows>
+											<ColumnListItem id="idColumnListItemFilterLocation2">
+												<cells>
+													<Label text="{Code}"/>
+													<Label text="{Text}"/>
+												</cells>
+											</ColumnListItem>
+										</suggestionRows>
+									</MultiInput>
+								</smartFilterBar:customControl>
+							</smartFilterBar:ControlConfiguration> -->
+							<smartFilterBar:ControlConfiguration index="4" visibleInAdvancedArea="true" key="CATEGORY" label="{i18n>CategoriesLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="5" visibleInAdvancedArea="true" key="SUBCATEGORY" label="{i18n>subCategoryLabel}"></smartFilterBar:ControlConfiguration>
+							<smartFilterBar:ControlConfiguration index="6" key="PRODUCTID" label="{i18n>ProductLabel}" visibleInAdvancedArea="true" groupId="_BASIC"
+								mandatory="mandatory">
+								<smartFilterBar:customControl>
+									<MultiInput id="idMultiInputProducts2" showSuggestion="true" maxSuggestionWidth="38em" showValueHelp="true" tokenUpdate="onTokenUpdate"
+										valueHelpRequest="onValueHelpRequestProducts" suggest="onSuggestFilterProduct" customData:hasValue="false"
+										suggestionItemSelected="onSuggestionItemSelectedFilterProduct">
+										<suggestionColumns>
+											<Column>
+												<Label text="{i18n>productIdLabel}"/>
+											</Column>
+											<Column>
+												<Label text="{i18n>productLabel}"/>
+											</Column>
+										</suggestionColumns>
+										<suggestionRows>
+											<ColumnListItem id="idColumnListItemFilterProduct2">
+												<cells>
+													<Label text="{ path: 'Code', formatter: '.formatter.formatProductId' }"/>
+													<Label text="{Text}"/>
+												</cells>
+											</ColumnListItem>
+										</suggestionRows>
+									</MultiInput>
+								</smartFilterBar:customControl>
+							</smartFilterBar:ControlConfiguration>
+
+							
+							<smartFilterBar:ControlConfiguration preventInitialDataFetchInValueHelpDialog="true" index="9" visibleInAdvancedArea="true" key="ZONE" label="{i18n>ZoneLabel}" mandatory="mandatory"></smartFilterBar:ControlConfiguration>  
+							
+							
+						</smartFilterBar:controlConfiguration>
+					</smartFilterBar:SmartFilterBar>
+                    <!-- raje -->
+
+				</f:content>
+			</f:DynamicPageHeader>
+		</f:header>
+		<f:content>
+			<VBox height="100%" width="100%">
+				<Panel>
+					<headerToolbar>
+						<OverflowToolbar>
+							<Title text="{i18n>simulatorTitle}"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<content>
+						<l:VerticalLayout width="100%">
+							<l:FixFlex>
+								<l:fixContent>
+									<Label text="{i18n>validityPeriodLabel}" class="sapUiSmallMarginEnd sapUiTinyMarginTop"></Label>
+									<DateRangeSelection id="idValidityPeriod" change="onChangeSimulateSelection" dateValue="{worklistView>/dateValueFrom}" secondDateValue="{worklistView>/dateValueTo}" width="50%"/>
+								</l:fixContent>
+							</l:FixFlex>
+							<FlexBox justifyContent="SpaceBetween" alignItems="End" width="100%">
+								<items>
+									<l:FixFlex>
+										<l:fixContent>
+											<Label text="{i18n>iWantToLabel}" class="sapUiTinyMarginTop sapUiSmallMarginEnd"></Label>
+											<Select id="idSimulatorOption" forceSelection="true"
+												items="{ path: '/SH_OptionSet', sorter: { path: 'Sequence' }, parameters: {operationMode: 'Client'}}" change="onChangeSimulatorOption"
+												class="sapUiSmallMarginEnd" selectedKey="{worklistView>/simulateSelectedOptionId}">
+												<core:Item key="{OptionId}" text="{Option}"/>
+											</Select>
+											<Label visible="{= ${worklistView>/simulateHasOperator} === '0'}" text="{i18n>of}" class="sapUiTinyMarginTop sapUiSmallMarginEnd"></Label>
+											<Label visible="{= ${worklistView>/simulateHasOperator} === '1'}" text="{i18n>comma}" class="sapUiTinyMarginTop sapUiSmallMarginEnd"></Label>
+											<Select visible="{= ${worklistView>/simulateHasOperator} === '1'}" id="idSimulatorOperator" forceSelection="true" items="{ path: '/VH_OperatorSet', parameters: {operationMode: 'Client'}}"
+												change="onChangeSimulateSelection" selectedKey="{worklistView>/simulateSelectedOperator}" class="sapUiSmallMarginEnd">
+												<core:Item key="{Code}" text="{Text}"/>
+											</Select>
+											<Label visible="{= ${worklistView>/simulateHasOperator} === '1'}" text="{i18n>by}" class="sapUiTinyMarginTop sapUiSmallMarginEnd"></Label>
+											<Input id="idSimulatorAmount" width="10rem" type="Number" placeholder="{i18n>enterAmountLabel}" value="{worklistView>/simulateAmount}" liveChange="onLiveChangeAmount" change="onChangeSimulateSelection"></Input>
+											<Label text="{worklistView>/simulateType}" class="sapUiTinyMarginTop sapUiSmallMarginBegin"></Label>
+            
+											<MultiInput id="idMultiInputProductsFilter" showSuggestion="true" maxSuggestionWidth="38em" showValueHelp="true" tokenUpdate="onTokenUpdate" valueHelpRequest="onValueHelpRequestProducts" suggest="onSuggestFilterProduct" customData:hasValue="false" suggestionItemSelected="onSuggestionItemSelectedFilterProduct" width="50%">
+												<suggestionColumns>
+													<Column>
+														<Label text="{i18n>productIdLabel}"/>
+													</Column>
+													<Column>
+														<Label text="{i18n>productLabel}"/>
+													</Column>
+												</suggestionColumns>
+												<suggestionRows>
+													<ColumnListItem id="idColumnListItemProductFilter">
+														<cells>
+															<Label text="{ path: 'Code', formatter: '.formatter.formatProductId' }"/>
+															<Label text="{Text}"/>
+														</cells>
+													</ColumnListItem>
+												</suggestionRows>
+											</MultiInput>
+
+										</l:fixContent>
+									</l:FixFlex>
+									<Button type="Emphasized" text="{i18n>SimulateText}" enabled="{worklistView>/isSimulateEnabled}" press="onPressSimulate"></Button>
+								</items>
+							</FlexBox>
+						</l:VerticalLayout>
+					</content>
+				</Panel>
+				
+				<!-- location level table-->
+				<smartTable:SmartTable visible="{worklistView>/setVisibleAsLocation}"   id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="Table" editable="false" busy="{worklistView>/busy}"
+					busyIndicatorDelay="{worklistView>/delay}" smartVariant="idSmartVariantManagement" beforeRebindTable="onBeforeRebindTable"
+					entitySet="ProductWorkbenchKPISet" useVariantManagement="false" useTablePersonalisation="true" header="{i18n>worklistTableTitle}"
+					showRowCount="true" enableExport="true" enableAutoBinding="false" persistencyKey="SmartTableProductWorkbench" ignoreFromPersonalisation="SUBCATEGORY"
+					requestAtLeastFields="LOCATIONID,PRODUCTID,CURRENCYKEY,COST,CURRENTPRICE,SALESORGANIZATIONID,PRODUCT,LOCATION,DISTRIBUTIONCHANNELID,COMPETITORPRICE,PRODUCTUNITOFMEASUREID,ProductWorkbenchId,CATEGORYID,SUBCATEGORYID,PLANNEDGROSSMARGINPERCENT,MATERIALGROUPID,PRICECHANGEHISTORYINDICATOR,VALIDFROM">
+					<smartTable:customToolbar>
+						<OverflowToolbar design="Transparent">
+							<ToolbarSpacer/>
+							<Button text="{i18n>aproveButton}" enabled="{worklistView>/isApproveEnabled}" press="onPressApprove"/>
+						</OverflowToolbar>
+					</smartTable:customToolbar>
+
+                    
+					<table:Table visibleRowCountMode="Auto" minAutoRowCount="10" rowSelectionChange="onRowSelectionChange" fixedColumnCount="3">
+						<table:Column width="8rem" hAlign="Right" sortProperty="CURRENTPRICE" filterProperty="CURRENTPRICE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "CURRENTPRICE", "columnIndex":"13", "leadingProperty": "CURRENTPRICE", "filterProperty": "CURRENTPRICE", "sortProperty": "CURRENTPRICE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnCurrentPrice}"/>
+							<table:template>
+								<FlexBox alignItems="Center" justifyContent="SpaceBetween">
+									<items>
+										<u:Currency stringValue="{CURRENTPRICE}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${CURRENTPRICE} !== null}"/>
+										<Button type="Transparent" press="onPressPriceChangeHistory" visible="{= ${PRICECHANGEHISTORYINDICATOR} !== null}"
+											tooltip="{i18n>worklistPriceChangeHistory}" icon="sap-icon://history"></Button>
+									</items>
+								</FlexBox>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" hAlign="Right" sortProperty="NEWPRICE" filterProperty="NEWPRICE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "NEWPRICE", "columnIndex":"14", "leadingProperty": "NEWPRICE", "filterProperty": "NEWPRICE", "sortProperty": "NEWPRICE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnNewPrice}"/>
+							<table:template>
+								<Input textAlign="Right" value="{NEWPRICE}" change="onChangeNewPrice" type="Number"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" hAlign="Right" sortProperty="PROPOSEDPRICE" filterProperty="PROPOSEDPRICE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "PROPOSEDPRICE", "columnIndex":"15", "leadingProperty": "PROPOSEDPRICE", "filterProperty": "PROPOSEDPRICE", "sortProperty": "PROPOSEDPRICE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnProposedPrice}"/>
+							<table:template>
+								<Link text="{PROPOSEDPRICE} {CURRENCYKEY}" press="onPressLinkProposedPrice" visible="{= ${PROPOSEDPRICE} !== '0.00'}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="PLANNEDGROSSMARGINPERCENT" filterProperty="PLANNEDGROSSMARGINPERCENT" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "PLANNEDGROSSMARGINPERCENT", "columnIndex":"16", "leadingProperty": "PLANNEDGROSSMARGINPERCENT", "filterProperty": "PLANNEDGROSSMARGINPERCENT", "sortProperty": "PLANNEDGROSSMARGINPERCENT"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnPlannedGrossMarginPercent}"/>
+							<table:template>
+								<Input textAlign="Right" value="{PLANNEDGROSSMARGINPERCENT}" change="onChangePlannedGrossMarginPercent" type="Number"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="GROSSMARGIN" filterProperty="GROSSMARGIN" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "GROSSMARGIN", "columnIndex":"18", "leadingProperty": "GROSSMARGIN", "filterProperty": "GROSSMARGIN", "sortProperty": "GROSSMARGIN"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnGrossMarginDollar}"/>
+							<table:template>
+								<u:Currency stringValue="{GROSSMARGIN}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${GROSSMARGIN} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="TOTALGROSSMARGIN" filterProperty="TOTALGROSSMARGIN" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "TOTALGROSSMARGIN", "columnIndex":"20", "leadingProperty": "TOTALGROSSMARGIN", "filterProperty": "TOTALGROSSMARGIN", "sortProperty": "TOTALGROSSMARGIN"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnTotalGrossMargin}"/>
+							<table:template>
+								<u:Currency stringValue="{TOTALGROSSMARGIN}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${TOTALGROSSMARGIN} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="NEWGROSSMARGIN" filterProperty="NEWGROSSMARGIN" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "NEWGROSSMARGIN", "columnIndex":"22", "leadingProperty": "NEWGROSSMARGIN", "filterProperty": "NEWGROSSMARGIN", "sortProperty": "NEWGROSSMARGIN"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnNewGrossMarginDollar}"/>
+							<table:template>
+								<u:Currency stringValue="{NEWGROSSMARGIN}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${NEWGROSSMARGIN} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="FOURWEEKSALESAMOUNT" filterProperty="FOURWEEKSALESAMOUNT" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "FOURWEEKSALESAMOUNT", "columnIndex":"33", "leadingProperty": "FOURWEEKSALESAMOUNT", "filterProperty": "FOURWEEKSALESAMOUNT", "sortProperty": "FOURWEEKSALESAMOUNT"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnTrailling4weeksSale}"/>
+							<table:template>
+								<u:Currency stringValue="{FOURWEEKSALESAMOUNT}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${FOURWEEKSALESAMOUNT} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" sortProperty="ONSALEFROMDATE" filterProperty="ONSALEFROMDATE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "ONSALEFROMDATE", "columnIndex":"36", "leadingProperty": "ONSALEFROMDATE", "filterProperty": "ONSALEFROMDATE", "sortProperty": "ONSALEFROMDATE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnOnSaleDate}"/>
+							<table:template>
+								<Text
+									text="{ path: 'ONSALEFROMDATE', type: 'sap.ui.model.odata.type.Date', formatOptions: { strictParsing: true, UTC: true }, constraints: { displayFormat: 'Date' } }"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" sortProperty="VALIDFROM" filterProperty="VALIDFROM" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "VALIDFROM", "columnIndex":"38", "leadingProperty": "VALIDFROM", "filterProperty": "VALIDFROM", "sortProperty": "VALIDFROM"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnValidFrom}"/>
+							<table:template>
+								<Text
+									text="{ path: 'VALIDFROM', type: 'sap.ui.model.odata.type.Date', formatOptions: { strictParsing: true, UTC: true }, constraints: { displayFormat: 'Date' } }"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" sortProperty="VALIDTO" filterProperty="VALIDTO" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "VALIDTO", "columnIndex":"39", "leadingProperty": "VALIDTO", "filterProperty": "VALIDTO", "sortProperty": "VALIDTO"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnValidTo}"/>
+							<table:template>
+								<Text
+									text="{ path: 'VALIDTO', type: 'sap.ui.model.odata.type.Date', formatOptions: { strictParsing: true, UTC: true }, constraints: { displayFormat: 'Date' } }"/>
+							</table:template>
+						</table:Column>
+					</table:Table>
+				</smartTable:SmartTable>
+
+                <!-- rajithaw table Tree  with Zone additon , this will be visible only if zone is selected-->
+				<smartTable:SmartTable visible="{worklistView>/setVisibleAsZone}"   id="idSmartTable2" smartFilterId="idSmartFilterBar2" tableType="TreeTable" editable="false" busy="{worklistView>/busy}"
+					busyIndicatorDelay="{worklistView>/delay}" smartVariant="idSmartVariantManagement" beforeRebindTable="onBeforeRebindTable"
+					entitySet="ProductWorkbenchKPISet2" useVariantManagement="false" useTablePersonalisation="true" header="{i18n>worklistZoneTableTitle}"
+					showRowCount="true" enableExport="true" enableAutoBinding="false" persistencyKey="SmartTableProductWorkbench" ignoreFromPersonalisation="SUBCATEGORY,NODEID,PARENTNODEID,DRILLSTATE,HIERARCHYLEVEL"
+					requestAtLeastFields="LOCATIONID,PRODUCTID,CURRENCYKEY,COST,CURRENTPRICE,SALESORGANIZATIONID,PRODUCT,LOCATION,DISTRIBUTIONCHANNELID,COMPETITORPRICE,PRODUCTUNITOFMEASUREID,ProductWorkbenchId,CATEGORYID,SUBCATEGORYID,PLANNEDGROSSMARGINPERCENT,MATERIALGROUPID,PRICECHANGEHISTORYINDICATOR,VALIDFROM,NODEID,PARENTNODEID,DRILLSTATE,HIERARCHYLEVEL,ZONETYPE,ZONENAME,ZONETYPENAME">
+					<smartTable:customToolbar>
+						<OverflowToolbar design="Transparent">
+							<ToolbarSpacer/>
+							<Button text="{i18n>aproveButton}" enabled="{worklistView>/isApproveEnabled}" press="onPressApprove"/>
+						</OverflowToolbar>
+					</smartTable:customToolbar>
+
+					<table:TreeTable visibleRowCountMode="Auto" minAutoRowCount="10" rowSelectionChange="onRowSelectionChange" fixedColumnCount="5">
+						<table:Column  width="8rem" hAlign="Right" sortProperty="CURRENTPRICE" filterProperty="CURRENTPRICE" autoResizable="true">
+							<table:customData >
+								<core:CustomData key="p13nData" 
+									value='\{"columnKey": "CURRENTPRICE", "columnIndex":"13", "leadingProperty": "CURRENTPRICE", "filterProperty": "CURRENTPRICE", "sortProperty": "CURRENTPRICE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnCurrentPrice}"/>
+							<table:template>
+								<FlexBox alignItems="Center" justifyContent="SpaceBetween">
+									<items>
+										<u:Currency stringValue="{CURRENTPRICE}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${CURRENTPRICE} !== null}"/>
+										<Button type="Transparent" press="onPressPriceChangeHistory" enabled="{=  ${PARENTNODEID} === '' }" visible="{=  ${PRICECHANGEHISTORYINDICATOR} !== null }"
+											tooltip="{i18n>worklistPriceChangeHistory}" icon="sap-icon://history"></Button>
+									</items>
+								</FlexBox>
+							</table:template>
+						</table:Column>
+
+						<table:Column width="8rem" hAlign="Right" sortProperty="NEWPRICE" filterProperty="NEWPRICE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "NEWPRICE", "columnIndex":"14", "leadingProperty": "NEWPRICE", "filterProperty": "NEWPRICE", "sortProperty": "NEWPRICE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnNewPrice}"/>
+							<table:template>
+								<Input enabled="{=  ${PARENTNODEID} === '' }" textAlign="Right" value="{NEWPRICE}" change="onChangeNewPrice" type="Number"/>
+							</table:template>
+						</table:Column>
+
+						<table:Column width="8rem" hAlign="Right" sortProperty="PROPOSEDPRICE" filterProperty="PROPOSEDPRICE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "PROPOSEDPRICE", "columnIndex":"15", "leadingProperty": "PROPOSEDPRICE", "filterProperty": "PROPOSEDPRICE", "sortProperty": "PROPOSEDPRICE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnProposedPrice}"/>
+							<table:template>
+								<Link enabled="{=  ${PARENTNODEID} === '' }" text="{PROPOSEDPRICE} {CURRENCYKEY}" press="onPressLinkProposedPrice" visible="{= ${PROPOSEDPRICE} !== '0.00'}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="PLANNEDGROSSMARGINPERCENT" filterProperty="PLANNEDGROSSMARGINPERCENT" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "PLANNEDGROSSMARGINPERCENT", "columnIndex":"16", "leadingProperty": "PLANNEDGROSSMARGINPERCENT", "filterProperty": "PLANNEDGROSSMARGINPERCENT", "sortProperty": "PLANNEDGROSSMARGINPERCENT"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnPlannedGrossMarginPercent}"/>
+							<table:template>
+								<Input enabled="{=  ${PARENTNODEID} === '' }" textAlign="Right" value="{PLANNEDGROSSMARGINPERCENT}" change="onChangePlannedGrossMarginPercent" type="Number"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="GROSSMARGIN" filterProperty="GROSSMARGIN" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "GROSSMARGIN", "columnIndex":"18", "leadingProperty": "GROSSMARGIN", "filterProperty": "GROSSMARGIN", "sortProperty": "GROSSMARGIN"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnGrossMarginDollar}"/>
+							<table:template>
+								<u:Currency stringValue="{GROSSMARGIN}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${GROSSMARGIN} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="TOTALGROSSMARGIN" filterProperty="TOTALGROSSMARGIN" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "TOTALGROSSMARGIN", "columnIndex":"20", "leadingProperty": "TOTALGROSSMARGIN", "filterProperty": "TOTALGROSSMARGIN", "sortProperty": "TOTALGROSSMARGIN"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnTotalGrossMargin}"/>
+							<table:template>
+								<u:Currency stringValue="{TOTALGROSSMARGIN}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${TOTALGROSSMARGIN} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="NEWGROSSMARGIN" filterProperty="NEWGROSSMARGIN" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "NEWGROSSMARGIN", "columnIndex":"22", "leadingProperty": "NEWGROSSMARGIN", "filterProperty": "NEWGROSSMARGIN", "sortProperty": "NEWGROSSMARGIN"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnNewGrossMarginDollar}"/>
+							<table:template>
+								<u:Currency stringValue="{NEWGROSSMARGIN}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${NEWGROSSMARGIN} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="auto" hAlign="Right" sortProperty="FOURWEEKSALESAMOUNT" filterProperty="FOURWEEKSALESAMOUNT" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "FOURWEEKSALESAMOUNT", "columnIndex":"33", "leadingProperty": "FOURWEEKSALESAMOUNT", "filterProperty": "FOURWEEKSALESAMOUNT", "sortProperty": "FOURWEEKSALESAMOUNT"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnTrailling4weeksSale}"/>
+							<table:template>
+								<u:Currency stringValue="{FOURWEEKSALESAMOUNT}" currency="{CURRENCYKEY}" useSymbol="false" visible="{= ${FOURWEEKSALESAMOUNT} !== null}"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" sortProperty="ONSALEFROMDATE" filterProperty="ONSALEFROMDATE" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "ONSALEFROMDATE", "columnIndex":"36", "leadingProperty": "ONSALEFROMDATE", "filterProperty": "ONSALEFROMDATE", "sortProperty": "ONSALEFROMDATE"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnOnSaleDate}"/>
+							<table:template>
+								<Text
+									text="{ path: 'ONSALEFROMDATE', type: 'sap.ui.model.odata.type.Date', formatOptions: { strictParsing: true, UTC: true }, constraints: { displayFormat: 'Date' } }"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" sortProperty="VALIDFROM" filterProperty="VALIDFROM" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "VALIDFROM", "columnIndex":"38", "leadingProperty": "VALIDFROM", "filterProperty": "VALIDFROM", "sortProperty": "VALIDFROM"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnValidFrom}"/>
+							<table:template>
+								<Text
+									text="{ path: 'VALIDFROM', type: 'sap.ui.model.odata.type.Date', formatOptions: { strictParsing: true, UTC: true }, constraints: { displayFormat: 'Date' } }"/>
+							</table:template>
+						</table:Column>
+						<table:Column width="8rem" sortProperty="VALIDTO" filterProperty="VALIDTO" autoResizable="true">
+							<table:customData>
+								<core:CustomData key="p13nData"
+									value='\{"columnKey": "VALIDTO", "columnIndex":"39", "leadingProperty": "VALIDTO", "filterProperty": "VALIDTO", "sortProperty": "VALIDTO"}'/>
+							</table:customData>
+							<Label text="{i18n>worklistTableColumnValidTo}"/>
+							<table:template>
+								<Text
+									text="{ path: 'VALIDTO', type: 'sap.ui.model.odata.type.Date', formatOptions: { strictParsing: true, UTC: true }, constraints: { displayFormat: 'Date' } }"/>
+							</table:template>
+						</table:Column>
+					</table:TreeTable>
+				</smartTable:SmartTable>
+				<!-- rajithaw end -->
+			</VBox>
+		</f:content>
+	</f:DynamicPage>
+	</IconTabFilter>
+	<IconTabFilter icon="sap-icon://expense-report" text="{i18n>costingAnalysis}">
+	</IconTabFilter>
+	</items>
+	</IconTabBar>
+</mvc:View>
